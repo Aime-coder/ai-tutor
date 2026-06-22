@@ -71,3 +71,23 @@ if user_input:
         "role"   : "assistant",
         "content": reply
     })
+    # Add a sidebar with settings
+with st.sidebar:
+    st.header("⚙️ Settings")
+    subject = st.selectbox(
+        "I want to learn about:",
+        ["Python Basics", "Machine Learning",
+         "Deep Learning", "AI APIs", "Data Science"]
+    )
+    difficulty = st.radio(
+        "My level:",
+        ["Beginner", "Intermediate", "Advanced"]
+    )
+    if st.button("🗑️ Clear Chat"):
+        st.session_state.messages = []
+        st.rerun()
+
+# Update system prompt with selections
+SYSTEM_PROMPT = f"""You are an AI tutor. The student wants to learn 
+about {subject} at {difficulty} level. Adjust your explanations 
+accordingly. Be encouraging and use practical examples."""
