@@ -2,6 +2,9 @@ import streamlit as st
 import os
 from dotenv import load_dotenv
 from openai import OpenAI
+import pandas as pd
+import numpy as np
+
 
 load_dotenv()
 
@@ -91,3 +94,34 @@ with st.sidebar:
 SYSTEM_PROMPT = f"""You are an AI tutor. The student wants to learn 
 about {subject} at {difficulty} level. Adjust your explanations 
 accordingly. Be encouraging and use practical examples."""
+
+#Add Student Data Analysis Feature
+
+
+# Add a tab for data analysis
+tab1, tab2 = st.tabs(["💬 AI Chat", "📊 Student Analysis"])
+
+with tab2:
+    st.header("Student Grade Analyzer")
+
+    # file upload
+    uploaded = st.file_uploader("Upload student CSV", type="csv")
+
+    if uploaded:
+        df = pd.read_csv(uploaded)
+        df["average"] = df[["math","science","english"]].mean(axis=1)
+
+        st.dataframe(df)
+
+        # AI analysis of the data
+        if st.button("🤖 Get AI Analysis"):
+            summary = df.describe().to_string()
+            response = client.chat.completions.create(
+                model    = "openrouter/free",
+                messages = [{
+                    "role"   : "user",
+                    "content": f"Analyze this student data and give insights:\n{summary}"
+                }],
+                max_tokens = 500
+            )
+            st.write(response.choices[0].message.content)
